@@ -2,6 +2,7 @@ require('../database');
 const express = require('express');
 const app = express();
 const routes = require('./routes/routes.js');
+const swaggerDocs = require('./routes/swagger.js');
 const port = 3000;
 
 
@@ -13,4 +14,5 @@ app.use('/', routes);
 
 app.listen(port, function() {
     console.log('Servidor API en: ' + port);
+    swaggerDocs(app, port);
 });

@@ -7,99 +7,1271 @@ const userController = require('../controllers/userController');
 const videoController = require('../controllers/videoController');
 const commentController = require('../controllers/commentController');
 const reviewController = require('../controllers/reviewController');
-const resetPassController = require('../controllers/resetPassController');
 
 
-//ruta que permite CREAR un USUARIO
+//--------------------------------------ROLES-----------------------------------------------------------------
+
+/**
+ * @openapi
+ *  /users:
+ *   post:
+ *     tags:
+ *       - SigIn
+ *     summary: Registrar un usuario
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/createdUser'
+ *     responses:
+ *       '200':
+ *         description: Usuario creado correctamente
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Usuario creado correctamente"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "Existe una cuenta asociada a tu dirección de correo electrónico. Si considera que es un error por favor comuníquese con el administrador"
+ */
 router.post('/users', userController.sigIn);
-//ruta que permite LOGEAR un USUARIO
+/**
+ * @openapi
+ *  /auth/login:
+ *   post:
+ *     tags:
+ *       - LogIn
+ *     summary: Crear sesion
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/logIn'
+ *     responses:
+ *       '200':
+ *         description: Usuario logueado correctamente
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Usuario logueado correctamente"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "Por favor ingrese todos los campos requeridos"
+ */
 router.post('/auth/login', authController.logIn);
 
 
-//ruta que permite CREAR un ROL
+/**
+ * @openapi
+ *  /roles:
+ *   post:
+ *     tags:
+ *       - Roles
+ *     summary: Registrar un rol
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/roleSchema'
+ *     responses:
+ *       '200':
+ *         description: Rol creado correctamente
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Rol creado correctamente"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+ *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+ *   get:
+ *     tags:
+ *       - Roles
+ *     summary: Obtener todos los roles 
+ *     responses:
+ *       '200':
+ *         description: Obtener todos los roles actuales
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "roles:[{...}]"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+ *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+ */
 router.post('/roles', authToken('administrator'), roleController.createRole);
-//ruta que permite OBTENER TODOS los roles creados
 router.get('/roles', authToken('administrator'), roleController.getAllRole);
-//ruta que permite OBTENER todos los ROLES que estan activos
-router.get('/roles/active', authToken('administrator'), roleController.getRoleActive);
-//ruta que permite OBTENER un ROL por medio del id
+  /**
+   * @openapi
+   * '/role/{id}':
+   *  get:
+   *     tags: 
+   *     - Roles
+   *     summary: Obtener solo un rol por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del rol
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "roles:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   *  put:
+   *     tags: 
+   *     - Roles
+   *     summary: Modificar solo un rol por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del rol
+   *        required: true
+    *     requestBody:
+    *       required: true
+    *       content:
+    *         application/json:
+    *           schema:
+    *             $ref: '#/components/schemas/roleSchema'
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "roles:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   *  delete:
+   *     tags:
+   *     - Roles
+   *     summary: Eliminar solo un rol por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del rol
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "Rol desactivado correctamente"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
 router.get('/role/:id', authToken('administrator'), roleController.getRoleById);
-//ruta que permite MODIFICAR un ROL
-router.put('/role/:id', authToken('administrator'), roleController.updateRole);
-//ruta que permite ELIMINAR un ROL
 router.delete('/role/:id', authToken('administrator'), roleController.deleteRole);
-//ruta que permite OBTENER todos los ROLES que estan inactivos
+router.put('/role/:id', authToken('administrator'), roleController.updateRole);
+
+ /**
+   * @openapi
+   * '/roles/inactive':
+   *  get:
+   *     tags: 
+   *     - Roles
+   *     summary: Obtener todos los roles que han sido desactivados
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "roles:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
 router.get('/roles/inactive', authToken('administrator'), roleController.getRoleInactive);
+ /**
+   * @openapi
+   * '/roles/active':
+   *  get:
+   *     tags: 
+   *     - Roles
+   *     summary: Obtener todos los roles activos
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "roles:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
+router.get('/roles/active', authToken('administrator'), roleController.getRoleActive);
 
 
+//--------------------------------------USUARIOS-----------------------------------------------------------------
 
-//ruta que permite OBTENER TODOS los usuarios creados
+/**
+ * @openapi
+ * '/users':
+  *   get:
+*     tags:
+*     - Users
+ *     summary: Obtener todos los usuarios 
+ *     responses:
+ *       '200':
+ *         description: Obtener todos los usuarios actuales
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "usuarios:[{...}]"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+ *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+ */
 router.get('/users', authToken('administrator'), userController.getAllUser);
-//ruta que permite OBTENER todos los usuarios que estan activos
-router.get('/users/active', authToken('administrator'), userController.getUserActive);
-//ruta que permite OBTENER un usuario por medio del id
+  /**
+   * @openapi
+   * '/user/{id}':
+   *  get:
+   *     tags:
+   *     - Users
+   *     summary: Obtener solo un usuario por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del usuario
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "usuarios:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   *  put:
+   *     tags: 
+   *     - Users
+   *     summary: Modificar solo un usuario por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del usuario
+   *        required: true
+    *     requestBody:
+    *       required: true
+    *       content:
+    *         application/json:
+    *           schema:
+    *             $ref: '#/components/schemas/userSchema'
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "roles:[{..}"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+   *  delete:
+   *     tags: 
+   *     - Users
+   *     summary: Eliminar solo un usuario por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del usuario
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "Usario desactivado correctamente"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
 router.get('/user/:id', authToken('administrator'), userController.getUserById);
-//ruta que permite MODIFICAR un usuario
 router.put('/user/:id', userController.updateUser);
-//ruta que permite ELIMINAR un usuario
 router.delete('/user/:id', authToken('administrator'), userController.deleteUser);
-//ruta que permite OBTENER todos los USUARIO que estan inactivos
+
+ /**
+   * @openapi
+   * '/users/inactive':
+   *  get:
+   *     tags: 
+   *     - Users
+   *     summary: Obtener todos los usuarios que han sido desactivados
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "users:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
 router.get('/users/inactive', authToken('administrator'), userController.getUserInactive);
+ /**
+   * @openapi
+   * '/users/active':
+   *  get:
+   *     tags: 
+   *     - Users
+   *     summary: Obtener todos los usuarios activos
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "usuarios:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
+router.get('/users/active', authToken('administrator'), userController.getUserActive);
 
 
-//ruta que permite SUBIR un video
+//--------------------------------------VIDEOS-----------------------------------------------------------------
+
+
+/**
+ * @openapi
+ *  /videos:
+ *   post:
+ *     tags:
+ *       - Videos
+ *     summary: Registrar un video
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/videoSchema'
+ *     responses:
+ *       '200':
+ *         description: video creado correctamente
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "video creado correctamente"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+ *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+ *   get:
+*     tags:
+ *     - Videos
+ *     summary: Obtener todos los videos 
+ *     responses:
+ *       '200':
+ *         description: Obtener todos los videos actuales
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "videos:[{...}]"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+ *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+ */
 router.post('/videos', authToken(['administrator', 'author']), videoController.uploadVideo);
-//ruta que permite AGREGAR los colaboradores del video
-router.put('/video/:id/collaborators', authToken(['administrator', 'author']), videoController.addColaborator);
-//ruta que permite OBTENER TODOS los videos creados
 router.get('/videos', authToken('administrator'), videoController.getAllVideo);
-//ruta que permite OBTENER TODOS los videos que esta activos
-router.get('/videos/active', authToken('administrator'), videoController.getAllVideo);
-//ruta que permite OBTENER TODOS los videos que esta inactivos
-router.get('/videos/inactive', authToken('administrator'), videoController.getVideoInactive);
-//ruta que permite OBTENER un video por medio del id
+
+
+
+  /**
+   * @openapi
+   * '/video/{id}':
+   *  get:
+   *     tags:
+   *     - Videos
+   *     summary: Obtener solo un video por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del video
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "videos:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+    *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   *  put:
+   *     tags: 
+   *     - Videos
+   *     summary: Modificar solo un video por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del video
+   *        required: true
+    *     requestBody:
+    *       required: true
+    *       content:
+    *         application/json:
+    *           schema:
+    *             $ref: '#/components/schemas/videoUpdateSchema'
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "videos:[{..}"
+  *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   *  delete:
+   *     tags: 
+   *     - Videos
+   *     summary: Eliminar solo un video por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del video
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "Video desactivado correctamente"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+ *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
 router.get('/video/:id', authToken('administrator'), videoController.getVideoById);
-//ruta que permite OBTENER los videos de un autor
-router.get('/video/author/:id', authToken('administrator'), videoController.getAuthorVideo);
-//ruta que permite OBTENER los videos de un colaborador
-router.get('/video/collaborator/:id', authToken('administrator'), videoController.getCollaboratorVideo);
-//ruta que permite OBTENER TODOS los videos publicos
-router.get('/videos/public', videoController.getPublicVideo);
-//ruta que permite OBTENER TODOS los videos privados
-router.get('/videos/private', authToken(['administrator', 'author', 'public user', 'collabroator']), videoController.getPublicVideo);
-//ruta que permite AGREGAR like del usuario
-router.put('/video/:id/likes', videoController.addLike);
-//ruta que permite OBTENER informacion de usuarios que le han dado like al video
-router.get('/video/:id/likes', authToken(['administrator', 'author','collabroator']), videoController.getUserWhoLiked);
-//ruta que permite MODIFICAR EL video
 router.put('/video/:id', authToken(['administrator', 'author']), videoController.updateVideo);
+router.delete('/video/:id', authToken(['administrator', 'author']), videoController.deleteVideo);
 
 
-//ruta que permite crear un comentario
+  /**
+   * @openapi
+   * '/video/{id}/collaborators':
+   *  put:
+   *     tags: 
+   *     - Videos
+   *     summary: Agregar los colaboradores a un video por medio del id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del video
+   *        required: true
+    *     requestBody:
+    *       required: true
+    *       content:
+    *         application/json:
+    *           schema:
+    *             $ref: '#/components/schemas/videoUpdateCollaboratorSchema'
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "video:[{..}"
+  *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
+router.put('/video/:id/collaborators', authToken(['administrator', 'author']), videoController.addColaborator);
+  /**
+   * @openapi
+   * '/video/author/{id}':
+   *  get:
+   *     tags:
+   *     - Videos
+   *     summary: Obtener video de un autor
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del autor
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "videos:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+    *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
+router.get('/video/author/:id', authToken('administrator'), videoController.getAuthorVideo);
+  /**
+   * @openapi
+   * '/video/collaborator/{id}':
+   *  get:
+   *     tags:
+   *     - Videos
+   *     summary: Obtener video de un colabroador
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del colaborador
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "videos:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+    *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
+router.get('/video/collaborator/:id', authToken('administrator'), videoController.getCollaboratorVideo);
+  /**
+   * @openapi
+   * '/videos/public':
+   *  get:
+   *     tags:
+   *     - Videos
+   *     summary: Obtener videos publicos activos
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "videos:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   */
+router.get('/videos/public', videoController.getPublicVideo);
+  /**
+   * @openapi
+   * '/videos/private':
+   *  get:
+   *     tags:
+   *     - Videos
+   *     summary: Obtener videos privados activos
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "videos:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+    *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
+router.get('/videos/private', authToken(['administrator', 'author', 'public user', 'collabroator']), videoController.getPublicVideo);
+  /**
+   * @openapi
+   * '/video/{id}/likes':
+   *  put:
+   *     tags: 
+   *     - Videos
+   *     summary: Agregar un like al video de un usuario
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del video
+   *        required: true
+    *     requestBody:
+    *       required: true
+    *       content:
+    *         application/json:
+    *           schema:
+    *             $ref: '#/components/schemas/videoLikesSchema'
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "video:[{..}"
+  *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+   */
+router.put('/video/:id/likes', videoController.addLike);
+ /**
+   * @openapi
+   * '/video/{id}/likes':
+   *  get:
+   *     tags:
+   *     - Videos
+   *     summary: Obtener informacion de los usuarios que agregaron like al video
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del video
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "users:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+    *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
+router.get('/video/:id/likes', authToken(['administrator', 'author','collabroator']), videoController.getUserWhoLiked);
+ /**
+   * @openapi
+   * '/videos/inactive':
+   *  get:
+   *     tags: 
+   *     - Videos
+   *     summary: Obtener todos los videos que han sido desactivados
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "videos:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
+router.get('/videos/inactive', authToken('administrator'), videoController.getVideoInactive);
+/**
+   * @openapi
+   * '/videos/active':
+   *  get:
+   *     tags: 
+   *     - Videos
+   *     summary: Obtener todos los videos activos
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "videos:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
+router.get('/videos/active', authToken('administrator'), videoController.getAllVideo);
+
+
+//--------------------------------------COMENTARIOS-----------------------------------------------------------------
+
+
+
+/**
+ * @openapi
+ *  /comments:
+ *   post:
+ *     tags:
+ *       - Comments
+ *     summary: Registrar un comentario
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/commentSchema'
+ *     responses:
+ *       '200':
+ *         description: comentario creado correctamente
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "comentario creado correctamente"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+ *   get:
+*     tags:
+*     - Comments
+ *     summary: Obtener todos los comentario 
+ *     responses:
+ *       '200':
+ *         description: Obtener todos los comentarios actuales
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "comentarios:[{...}]"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+ *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+ */
 router.post('/comments', commentController.createComment);
-//ruta que permite OBTENER TODOS los comentarios creados
 router.get('/comments', authToken('administrator'), commentController.getAllComment);
-//ruta que permite OBTENER todos los comentarios que estan activos
-router.get('/comments/active', authToken('administrator'), commentController.getCommentActive);
-//ruta que permite OBTENER un comentario por medio del id
+
+   /**
+   * @openapi
+   * '/comment/{id}':
+   *  get:
+   *     tags:
+   *     - Comments
+   *     summary: Obtener solo un comentario por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del comentario
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "comentario:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   *  put:
+   *     tags: 
+   *     - Comments
+   *     summary: Modificar solo un video por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del video
+   *        required: true
+    *     requestBody:
+    *       required: true
+    *       content:
+    *         application/json:
+    *           schema:
+    *             $ref: '#/components/schemas/commentUpdateSchema'
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "comentarios:[{..}"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   *  delete:
+   *     tags: 
+   *     - Comments
+   *     summary: Eliminar solo un comentario por medio de id
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del comentario
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "comentario desactivado correctamente"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
 router.get('/comment/:id', authToken('administrator'), commentController.getCommentById);
-//ruta que permite MODIFICAR un comentario
 router.put('/comment/:id', authToken('administrator'), commentController.updateComment);
-//ruta que permite ELIMINAR un comentario
 router.delete('/comment/:id', authToken('administrator'), commentController.deleteComment);
-//ruta que permite OBTENER todos los comentarios que estan inactivos
+ /**
+   * @openapi
+   * '/comments/inactive':
+   *  get:
+   *     tags: 
+   *     - Comments
+   *     summary: Obtener todos los comentarios que han sido desactivados
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "comments:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
 router.get('/comments/inactive', authToken('administrator'), commentController.getCommentInactive);
-//Ruta que permtite OBTENER los comentarios por usuario
-router.get('/comments/user', authToken(['administrator']), commentController.getCommentByUser);
-//Ruta que permtite OBTENER los comentarios del video
+ /**
+   * @openapi
+   * '/comments/active':
+   *  get:
+   *     tags: 
+   *     - Comments
+   *     summary: Obtener todos los roles comentarios activos
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "comments:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+   *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
+router.get('/comments/active', authToken('administrator'), commentController.getCommentActive);
+ /**
+   * @openapi
+   * '/comments/user/{id}':
+   *  get:
+   *     tags:
+   *     - Comments
+   *     summary: Obtener los comentarios del usuario
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del usuario
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "comentarios:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+    *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
+router.get('/comments/user/:id', authToken(['administrator']), commentController.getCommentByUser);
+ /**
+   * @openapi
+   * '/comments/video/{id}':
+   *  get:
+   *     tags:
+   *     - Comments
+   *     summary: Obtener los comentarios del video
+   *     parameters:
+   *      - name: id
+   *        in: path
+   *        description: id del video
+   *        required: true
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *          application/json:
+   *             example:
+   *               message: "comentarios:[{..}"
+   *       '400':
+   *         description: Error de datos ingresados
+   *         content:
+   *           application/json:
+   *             example:
+   *               message: "Por favor ingrese todos los campos "
+    *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+   */
 router.get('/comments/video/:id', authToken(['administrator', 'author', 'collabroator']), commentController.getCommentByVideo);
 
 
-//ruta que permite agregar puntuacion al video
+
+//--------------------------------------RESEÑAS-----------------------------------------------------------------
+
+/**
+ * @openapi
+ *  /reviews:
+ *   post:
+ *     tags:
+ *       - Reviews
+ *     summary: Registrar una reseña 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/reviewSchema'
+ *     responses:
+ *       '200':
+ *         description: reseña creada correctamente
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "reseña creada correctamente"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+ *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+ *   get:
+*     tags:
+*     - Reviews 
+ *     summary: Obtener todos las reseñas 
+ *     responses:
+ *       '200':
+ *         description: Obtener todos las reseñas actuales
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "reviews:[{...}]"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+ *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+ */
 router.post('/reviews',authToken(['administrator', 'author', 'collabroator']), reviewController.createReview);
-//ruta que permite OBTENER TODOS los usuarios creados
 router.get('/reviews', authToken('administrator'), reviewController.getAllReview);
-//obtener los 3 videos mejores calificados
+
+/**
+ * @openapi
+ *  /reviews/video/popular:
+ *   get:
+*     tags:
+*     - Reviews 
+ *     summary: Obtener los 3 videos con mejor calificacion
+ *     responses:
+ *       '200':
+ *         description: Obtener los 3 videos con mejor calificacion
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "videos:[{...}]"
+ *       '400':
+ *         description: Error de datos ingresados
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Por favor ingrese todos los campos "
+ *       '403':
+ *         description: Autorización denegada
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No tiene permisos suficientes para estar aqui"
+ */
 router.get('/reviews/video/popular',authToken(['administrator', 'author', 'collabroator']), reviewController.getTop3Video);
 
 
