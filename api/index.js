@@ -12,7 +12,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/', routes);
 
 
+
+
 app.listen(port, function() {
     console.log('Servidor API en: ' + port);
     swaggerDocs(app, port);
 });
+
+module.exports = app;
